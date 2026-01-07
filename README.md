@@ -5,12 +5,12 @@
 <p>This repository presents a comparative study of different deep learning architectures for image classification tasks in computer vision. A baseline CNN, U-Net, and Inception-based models were implemented and evaluated to analyze their performance across multiple metrics.</p>
 
 ## 🧠 Models Implemented
-### Baseline CNN
+### Baseline CNN (Created by me) 
 - Simple convolutional architecture
 - Used as a performance reference model
 
 ### U-Net 
-- Encoder–decoder architecture
+- Encoder–decoder architecture 
 - Adapted for classification by modifying the output layers
 
 ### Inception Model
