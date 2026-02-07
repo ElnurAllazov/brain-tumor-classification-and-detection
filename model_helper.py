@@ -74,15 +74,12 @@ except ImportError:
 def get_prediction_result(model_id, image_bytes):
     """
     Main entry point for prediction. 
-    Routes to real model if loaded, otherwise falls back to mock.
+    Routes to real model if loaded, otherwise raises an error.
     """
     if model_id in loaded_models:
         return predict_real(model_id, image_bytes)
     else:
-        # If model is missing, do mock but use the requested model name in response
-        result = predict_mock(image_bytes)
-        result["mode"] = f"mock ({model_id})"
-        return result
+        raise ValueError(f"Model '{model_id}' is not loaded. Please ensure the .keras file exists.")
 
 def predict_real(model_id, image_bytes):
     """
@@ -90,7 +87,7 @@ def predict_real(model_id, image_bytes):
     """
     curr_model = loaded_models.get(model_id)
     if not curr_model:
-        return predict_mock(image_bytes)
+        raise ValueError(f"Model '{model_id}' session not found.")
     
     try:
         # 1. Determine the expected size and preprocessing
@@ -100,7 +97,6 @@ def predict_real(model_id, image_bytes):
         # 2. Load and resize
         image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
         image = image.resize(target_size)
-        img_array = np.array(image)
         
         # 3. Apply scaling
         # Based on your notebook: rescale=1./255 for all models
@@ -133,37 +129,3 @@ def predict_real(model_id, image_bytes):
     except Exception as e:
         print(f"❌ ERROR during prediction with '{model_id}': {str(e)}")
         raise e
-
-def predict_mock(image_bytes):
-    """
-    Mock prediction logic until model weights are provided.
-    """
-    # Simulate some processing time
-    time.sleep(1.5)
-    
-    # Randomly pick a class and a confidence score
-    predicted_class = random.choice(CLASS_NAMES)
-    confidence = random.uniform(0.85, 0.99)
-    
-    # Generate probabilities for all classes
-    probs = {}
-    remaining = 1.0 - confidence
-    for cls in CLASS_NAMES:
-        if cls == predicted_class:
-            probs[cls] = confidence
-        else:
-            p = random.uniform(0, remaining)
-            probs[cls] = p
-            remaining -= p
-    
-    # Normalize remaining to ensure it adds up
-    total = sum(probs.values())
-    for cls in probs:
-        probs[cls] /= total
-
-    return {
-        "class": predicted_class,
-        "confidence": confidence,
-        "probabilities": probs,
-        "mode": "mock"
-    }
