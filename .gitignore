@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+env/
+venv/
+
+# Large model files (GitHub has a 100MB limit)
+# It is better to keep these locally or use Git LFS
+*.keras
+*.h5
+checkpoint/
